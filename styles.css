@@ -1,0 +1,180 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alice&display=swap');
+
+/* *{
+    margin: 0;
+    padding: 0;
+} */
+body, html{
+    /* font-family: Arial, sans-serif; */
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    /* font-weight: <weight>; */
+    font-style: normal;
+}
+
+header {
+    background-color: #333;
+    /* height: 20vh; */
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+}
+/* To fix the position of header */
+.sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+header ul{
+    width: 80%;
+
+    display: flex;
+    justify-content: space-between;
+}
+
+header ul li{
+    padding: 10px;
+    list-style-type: none;
+}
+
+header ul li a{
+    text-decoration: none;
+    color: white;
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+  
+.dropdown-content a:hover {background-color: #f1f1f1}
+  
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+  
+/* .dropdown:hover .dropbtn {
+    background-color: #3e8e41;
+} */
+
+.header ul li a #searchinput{
+    padding: 8px 12px;
+
+}
+button .searchbtn{
+    border: 1px solid black;
+    background: rgb(214, 213, 213);
+    border-radius: 5px;
+    padding: 8px 12px;
+}
+
+main {
+    /* float: left; */
+    width: 100%;
+    /* padding: 20px; */
+}
+.container{
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+
+}
+.container img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    /* opacity: 0.9; */
+}
+
+.bottom-left{
+    position: absolute;
+    bottom: 220px;
+    left: 170px;
+    color: white;
+    font-family: "Alice", serif;
+    font-weight: 400;
+    font-style: normal;
+    
+}
+
+.bottom-left button{
+    border: 2px solid white;
+    background: none;
+    padding: 12px 10px;
+    color: white;
+}
+aside {
+    float: right;
+    width: 30%;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+#productList, #popular_products, #vodkaList, #whiskeyList, #rumList, #beerList, #wineList{
+    display: flex;
+    
+    /* flex-wrap: wrap; */
+    justify-content: space-around;
+}
+
+.product, .popularproduct, .vodkaproduct, .whiskeyproduct, .rumproduct, .beerproduct, .wineproduct{
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 15px;
+    width: 200px;
+}
+
+.product:hover, .popularproduct:hover, 
+.vodkaproduct:hover, .whiskeyproduct:hover, 
+.rumproduct:hover, .beerproduct:hover, .wineproduct:hover{
+    cursor: pointer;
+    transform: scale(1.2);
+    box-shadow: 7px 9px 12px 4px rgba(0,0,0,0.67);
+    -webkit-box-shadow: 7px 9px 12px 4px rgba(0,0,0,0.67);
+    -moz-box-shadow: 7px 9px 12px 4px rgba(0,0,0,0.67);
+}
+
+
+#cart {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.addtocartbtn{
+    border: 1px solid black;
+    background: rgb(214, 213, 213);
+    border-radius: 5px;
+    padding: 8px 12px;
+    width: 100%;
+
+} 
+
+.addtocartbtn:hover{
+    background: black;
+    color: white;
+}
+
+button {
+    cursor: pointer;
+    font-family: "Montserrat", sans-serif;
+
+}
