@@ -86,7 +86,7 @@ if (isset($_SESSION['cart_message'])) {
                                         $imageData = $row['image'];
                                         $imageSrc = 'data:image/png;base64,' . base64_encode($imageData);
                                         ?>
-                                        <img src="<?= $imageSrc ?>" style="height: 150px;" alt="<?= $row['name']; ?>">
+                                        <img src="displaywine.php?id=<?php echo $row['id'];?>" style="height: 150px;" alt="<?= $row['name']; ?>">
                                         <h5><?= $row['name']; ?></h5>
                                         <h5>Rs.<?= number_format($row['price'], 2); ?></h5>
                                         <input type="hidden" name="name" value="<?= $row['name'] ?>">

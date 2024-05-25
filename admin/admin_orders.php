@@ -1,165 +1,119 @@
-
-
 <?php
-
 session_start();
-    include("connection.php");
-    include("functions.php");
+include("../connection.php");
+include("../functions.php");
 
-    if(isset($_POST["confirmPaymentBtn"])){
-        // Set a session variable to store the message
-        // $_SESSION['order_message'] = "Your order has been placed.";
-        // $_SESSION['order_message_class'] = "alert-success"; // Set the class for styling
+// Check if the admin is logged in
+$admin_data = check_login($conn);
+$admin_id = $admin_data['id'];
 
-        if(isset($_SESSION["cart"])){
-            $session_array_id = array_column($_SESSION["cart"],"id");
+// Fetch all orders data
+$query = "SELECT id, user_id, product_name, price, order_quantity FROM ordered_products";
+$result = mysqli_query($conn, $query);
 
-            if(!in_array($_GET["id"], $session_array_id)){
-                $session_array = array(
-                    'id' => $_GET['id'],
-                    'name' => $_POST['name'],
-                    'price' => $_POST['price'], 
-                    'quantity' => $_POST['quantity']
-                );
-                $_SESSION['cart'][] = $session_array;
-            }
+if (!$result) {
+    die("Error: " . mysqli_error($conn));
+}
 
-        } else {
-            $session_array = array(
-                'id' => $_GET['id'],
-                'name' => $_POST['name'],
-                'price' => $_POST['price'], 
-                'quantity' => $_POST['quantity']
-            );
-            $_SESSION['cart'][] = $session_array;
-        }
-    } 
-
-    if(isset($_POST["confirmcancelorderBtn"])){
-        unset($_SESSION['cart']);
-        $_SESSION['order_message'] = "Your order has been canceled.";
+if (isset($_POST["ConfirmCancelOrderBtn"])) {
+    // Delete the specific order from the ordered_products table
+    $order_id = $_POST['order_id'];
+    echo $order_id;
+    $deleteQuery = "DELETE FROM ordered_products WHERE id = $order_id";
+    if (mysqli_query($conn, $deleteQuery)) {
+        $_SESSION['order_message'] = "Order cancelled successfully.";
+        $_SESSION['order_message_class'] = "alert-success";
+    } else {
+        $_SESSION['order_message'] = "Error: " . mysqli_error($conn);
         $_SESSION['order_message_class'] = "alert-danger";
     }
-    // Display order message if it exists
-    if (isset($_SESSION['order_message'])) {
-        echo "<div class='alert " . $_SESSION['order_message_class'] . "' id='order-message'>" . $_SESSION['order_message'] . "</div>";
-        
-        // Clear the message after displaying it
-        unset($_SESSION['order_message']);
-        unset($_SESSION['order_message_class']);
-    }
 
+    // Redirect to refresh the page and reflect the changes
+    header("Location: admin_orders.php");
+    exit(); // Ensure that no further code is executed after the redirection
+}
 
+// Display order message if it exists
+if (isset($_SESSION['order_message'])) {
+    echo "<div class='alert " . $_SESSION['order_message_class'] . "' id='order-message'>" . $_SESSION['order_message'] . "</div>";
+    // Clear the message after displaying it
+    unset($_SESSION['order_message']);
+    unset($_SESSION['order_message_class']);
+}
 ?>
-<?php
-
-?>
-
-
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orders</title>
+    <title>Admin Orders</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <?php include'admin_header.php'; ?>
-    <!-- <h2>Vodka</h2>
-    <div id="vodkaList">
-        Product list will be displayed here
-    </div> -->
+    <?php include 'admin_header.php'; ?>
 
     <div class="container-fluid">
         <div class="col-md-12">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-10 offset-md-1">
                     <h2 class="text-center">Orders</h2>
 
                     <?php
-                        // var_dump($_SESSION['cart']);
-                        $total = 0;
-                        $output = "";
-                        // $output .= "
-                        // <table class='table table-bordered table-striped'>
-                        //     <tr>
-                        //     <th>ID</th>
-                        //     <th>Name</th>
-                        //     <th>Price</th>
-                        //     <th>Quantity</th>
-                        //     <th>Price</th>
-                        //     <th>Action</th>
-                        //     </tr>
-                        
-                        // ";
+                    $output = "";
+                    $total = 0;
 
-                        if(!empty($_SESSION["cart"])) {
-
-                            $output .= "
-                            <table class='table table-bordered table-striped'>
-                                <tr>
-                                <th>ID</th>
-                                <th>Name</th>
+                    if (mysqli_num_rows($result) > 0) {
+                        $output .= "
+                        <table class='table table-bordered table-striped'>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>User ID</th>
+                                <th>Product Name</th>
                                 <th>Price</th>
                                 <th>Quantity</th>
-                                <th>Price</th>
-                                
-                                </tr>
-                            
-                            ";
+                                <th>Total Price</th>
+                                <th>Action</th>
+                            </tr>
+                        ";
 
-                            foreach($_SESSION["cart"] as $key => $value) {
-                                $output .= "
-                                <tr>
-                                <td>".$value['id']."</td>
-                                <td>".$value['name']."</td>
-                                <td>".$value['price']."</td>
-                                <td>".$value['quantity']."</td>
-                                <td>Rs.".number_format($value['price'] * $value['quantity'],2)."</td>
-
-                        
-                                </tr>
-
-                        
-                                ";
-
-                                $total = $total + $value["price"] * $value["quantity"];
-                            }
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            $total_price = $row['price'] * $row['order_quantity'];
                             $output .= "
-                                <tr>
-                                <td colspan='3'></td>
-                                <td><b>Total Price</b></td>
-                                <td>Rs.".number_format($total,2)."</td>
-
-                                
-                                </tr>
-
-                            ";
-
-                            $output .= "
-                                <tr>
-                                <td colspan='4'></td>
-                                <td>
-                                    <a href='orders.php?action=cancel_order'>
-                                    <button id='cancelorderBtn' class='btn btn-warning btn-block'>Cancel Order</button>
-                                    </a> 
+                            <tr>
+                                <td>{$row['id']}</td>
+                                <td>{$row['user_id']}</td>
+                                <td>" . htmlspecialchars($row['product_name']) . "</td>
+                                <td>Rs." . number_format($row['price'], 2) . "</td>
+                                <td>{$row['order_quantity']}</td>
+                                <td>Rs." . number_format($total_price, 2) . "</td>
+                                <td>  
+                                    <input type='hidden' name='order_id' value='{$row['id']}'>
+                                    <a href='admin_orders.php?action=cancel_order'>
+                                        <button id='cancelorderBtn' name='cancelorderBtn' class='btn btn-danger'>Cancel Order</button>
+                                    </a>
+                                    
                                 </td>
-                                </tr>
-                            
+                            </tr>
                             ";
 
-                        } else {
-                            ?>
-                                <h4>You haven't ordered yet.</h2>
-                            <?php
+                            $total += $total_price;
                         }
 
+                        $output .= "
+                            <tr>
+                                <td colspan='5'></td>
+                                <td><b>Total</b></td>
+                                <td>Rs." . number_format($total, 2) . "</td>
+                            </tr>
+                        ";
 
+                        $output .= "</table>";
+                    } else {
+                        $output .= "<h4 class='text-center'>No orders found.</h4>";
+                    }
 
-
-                        echo $output;
+                    echo $output;
                     ?>
                 </div>
             </div>
@@ -183,7 +137,7 @@ if(isset($_GET["action"]) && $_GET['action'] == "cancel_order") {
                     <option value="blah blah 4">blah blah 4</option>
                     <option value="blah blah 5">blah blah 5</option>
                 </select>
-                <button id="confirmcancelorderBtn" name="confirmcancelorderBtn" class="btn btn-primary"> Confirm Cancel</button>
+                <button id="ConfirmCancelOrderBtn" name="ConfirmCancelOrderBtn" class="btn btn-primary"> Confirm Cancel</button>
             </div>
         </form>
 
@@ -218,7 +172,7 @@ if(isset($_GET["action"]) && $_GET['action'] == "cancel_order") {
                 document.getElementById("popup").style.display = "block";
             });
 
-            document.getElementById("confirmcancelorderBtn").addEventListener("click", function() {
+            document.getElementById("ConfirmCancelOrderBtn").addEventListener("click", function() {
                 var cancelReason = document.getElementById("cancelreason").value;
                 // Perform further actions based on the selected cancel reason
                 // alert("Your order has been canceled. Reason: " + cancelReason);

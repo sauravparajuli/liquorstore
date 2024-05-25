@@ -11,15 +11,6 @@ global $id;
 // echo $user_data['id'];
 
 
-foreach ($_SESSION["cart"] as $key => $value) {
-    echo $user_data['id'] . "<br>";
-    echo $value['name'] . "<br>";
-    echo $value['price'] . "<br>";
-    echo $value['quantity'] . "<br>";
-    echo "<br>";
-
-}
-
 // If the user is not logged in, redirect to the login page
 if (!$user_data) {
     header("Location: login.php");
@@ -67,14 +58,20 @@ if (isset($_POST["confirmPaymentBtn"])) {
                 // Log the SQL query, error message, and any relevant variables
             }
         }
+
+        // Clear the cart after inserting the order
+        $_SESSION["cart"] = [];
+
+        // Redirect to the orders.php page
+        header("Location: orders.php");
+        exit(); // Ensure that no further code is executed after the redirection
+    
     } else {
         // Handle if the cart is empty
         echo "Cart is empty.";
     }
 
-    // Redirect to the orders.php page
-    header("Location: orders.php");
-    exit(); // Ensure that no further code is executed after the redirection
+
 }
 
 
@@ -105,7 +102,7 @@ if (isset($_POST["confirmPaymentBtn"])) {
     <div class="container-fluid">
         <div class="col-md-12">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-8 offset-md-2">
                     <h2 class="text-center">Cart</h2>
 
                     <?php
@@ -168,6 +165,8 @@ if (isset($_POST["confirmPaymentBtn"])) {
                                 <td><b>Total Price</b></td>
                                 <td>Rs.".number_format($total,2)."</td>
 
+                                
+
                                 <td>
                                     <a href='cart.php?action=clearall'>
                                     <button class='btn btn-warning btn-block'>Clear Cart</button>
@@ -191,7 +190,7 @@ if (isset($_POST["confirmPaymentBtn"])) {
 
                         } else {
                             ?>
-                                <h4>Cart is empty.</h2>
+                                <h4 class="text-center">Cart is empty.</h2>
                             <?php
                         }
 

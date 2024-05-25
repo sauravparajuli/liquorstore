@@ -2,43 +2,49 @@
 <?php
 
 session_start();
-    include("../connection.php");
-    include("../functions.php");
+include("../connection.php");
+include("../functions.php");
 
-    function uploadDataToDatabase($itemType, $name, $price, $imageData){
-        global $conn;
-        //$imageData = base64_encode($imageData);
-        if(!empty($name) && !empty($price) && !empty($imageData)){
-            $query = "INSERT INTO $itemType (name, price, image) VALUES ('$name', '$price', $imageData)";
+function uploadDataToDatabase($tableName, $name, $price, $imageData, $imageType) {
 
-            if ($conn->query($query) === TRUE) {
-                echo "Data uploaded successfully.";
-            } else {
-                echo "Error: " . $query . "<br>" . $conn->error;
-            }
-        } else {
-            echo"Please enter all the information!";
+    global $conn;
 
-        }
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
     }
 
-    if($_SERVER['REQUEST_METHOD'] == "POST"){
-        if(isset($_FILES["image"])){
-            $itemType = $_POST["item_type"];
-            $name = $_POST["name"];
-            $price = $_POST['price'];
-//            $imageData = $_FILES['image'];
-            $imageData = file_get_contents($_FILES["image"]["tmp_name"]);
-
-            //$imageData = file_get_contents($_FILES["image"]["tmp_name"]);
-            // echo $imageData;
-            // echo $imageSrc;
-            uploadDataToDatabase($itemType, $name, $price, $imageData);
-        } else {
-            echo"Please select an image file!";
-        }
+    // Prepare the SQL statement
+    $stmt = $conn->prepare("INSERT INTO $tableName (name, price, image, image_type) VALUES (?, ?, ?, ?)");
+    if ($stmt === false) {
+        die("Prepare failed: " . $conn->error);
     }
 
+    $null = NULL;
+    $stmt->bind_param('sdbs', $name, $price, $null, $imageType);
+    $stmt->send_long_data(2, $imageData);
+
+    // Execute the statement
+    if ($stmt->execute()) {
+        echo "Data and image uploaded successfully.";
+    } else {
+        echo "Failed to upload data and image: " . $stmt->error;
+    }
+
+    // Close the statement and connection
+    $stmt->close();
+    $conn->close();
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image']['tmp_name'])) {
+    $itemType = $_POST['item_type'];
+    $name = $_POST['name'];
+    $price = $_POST['price'];
+    $image = $_FILES['image']['tmp_name'];
+    $imageType = $_FILES['image']['type'];
+    $imageData = file_get_contents($image);
+
+    uploadDataToDatabase($itemType, $name, $price, $imageData, $imageType);
+}
 
 ?>
 
