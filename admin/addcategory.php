@@ -25,15 +25,21 @@ function uploadDataToDatabase($tableName, $name, $price, $imageData, $imageType)
 
     // Execute the statement
     if ($stmt->execute()) {
-        echo "Data and image uploaded successfully.";
+        // echo "Data and image uploaded successfully.";
+        $_SESSION['update_message'] = "Data and image uploaded successfully.";
+
     } else {
-        echo "Failed to upload data and image: " . $stmt->error;
+        $_SESSION['update_message'] = "Failed to upload data and image: " . $stmt->error;
+        // echo "Failed to upload data and image: " . $stmt->error;
     }
+    $_SESSION['update_message_class'] = "alert-success"; // Set the class for styling
+
 
     // Close the statement and connection
     $stmt->close();
     $conn->close();
 }
+
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image']['tmp_name'])) {
     $itemType = $_POST['item_type'];
@@ -46,6 +52,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image']['tmp_name']))
     uploadDataToDatabase($itemType, $name, $price, $imageData, $imageType);
 }
 
+?>
+
+<?php
+// Display cart message if it exists
+if (isset($_SESSION['update_message'])) {
+    echo "<div class='alert " . $_SESSION['update_message_class'] . "' id='update-message'>" . $_SESSION['update_message'] . "</div>";
+    
+    // Clear the message after displaying it
+    unset($_SESSION['update_message']);
+    unset($_SESSION['update_message_class']);
+}
 ?>
 
 
@@ -81,5 +98,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image']['tmp_name']))
 
         <input type="submit" value="Upload">
     </form>
+
+
+<script>
+// JavaScript code to hide the alert after a few seconds
+setTimeout(function() {
+    document.getElementById('update-message').style.display = 'none';
+}, 2000); // Adjust the time (in milliseconds) as needed
+</script>
+
+
 </body>
 </html>

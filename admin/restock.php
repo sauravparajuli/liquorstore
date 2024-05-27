@@ -14,20 +14,16 @@ session_start();
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $productId);
         if ($stmt->execute()) {
-            echo "Stock updated successfully.";
+            // echo "Stock updated successfully.";
+            $_SESSION['stockupdate_message'] = "Stock updated successfully.";
+
         } else {
             echo "Error updating stock: " . $conn->error;
         }
+        $_SESSION['stockupdate_message_class'] = "alert-success"; // Set the class for styling
+
     }   
     
-
-
-    if(isset($_POST["update_stock"])){
-        // Set a session variable to store the message
-        $_SESSION['stockupdate_message'] = "Stock updated successfully.";
-        $_SESSION['stockupdate_message_class'] = "alert-success"; // Set the class for styling
-    
-    }
     // Display cart message if it exists
     if (isset($_SESSION['stockupdate_message'])) {
         echo "<div class='alert " . $_SESSION['stockupdate_message_class'] . "' id='stockupdate-message'>" . $_SESSION['stockupdate_message'] . "</div>";

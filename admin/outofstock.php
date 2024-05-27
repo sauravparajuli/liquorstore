@@ -14,13 +14,29 @@ session_start();
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $productId);
         if ($stmt->execute()) {
-            echo "Stock updated successfully.";
+            // echo "Stock updated successfully.";
+            $_SESSION['update_message'] = "Stock updated successfully.";
+
         } else {
-            echo "Error updating stock: " . $conn->error;
+            // echo "Error updating stock: " . $conn->error;
+            $_SESSION['update_message'] = "Error updating stock: " . $conn->error;
+
         }
+        // Set a session variable to store the message
+        $_SESSION['update_message_class'] = "alert-success"; // Set the class for styling
     }
 
 
+?>
+<?php
+// Display cart message if it exists
+if (isset($_SESSION['update_message'])) {
+    echo "<div class='alert " . $_SESSION['update_message_class'] . "' id='update-message'>" . $_SESSION['update_message'] . "</div>";
+    
+    // Clear the message after displaying it
+    unset($_SESSION['update_message']);
+    unset($_SESSION['update_message_class']);
+}
 ?>
 
 <!DOCTYPE html>
@@ -29,6 +45,8 @@ session_start();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Set Product OUT-OF-STOCK</title>
+    <link rel="stylesheet" href="../newstyles.css">
+    <link rel="stylesheet" href="../styles.css"> 
 </head>
 <body>
     <?php include'admin_header.php'; ?>
@@ -78,6 +96,12 @@ session_start();
     </form>
 
 
+<script>
+// JavaScript code to hide the alert after a few seconds
+setTimeout(function() {
+    document.getElementById('update-message').style.display = 'none';
+}, 2000); // Adjust the time (in milliseconds) as needed
+</script>
 
 </body>
 </html>
